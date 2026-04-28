@@ -7,6 +7,7 @@ from filesystem.delete import delete_path
 from filesystem.count import count_files
 from filesystem.search import search_files
 from filesystem.add_date import add_date
+from filesystem.analyse import analyse
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -39,8 +40,13 @@ def main():
     # add-date
     p_date = subparsers.add_parser("add-date", help="Добавить дату создания в имя файла")
     p_date.add_argument("path", help="Файл или папка")
-    p_date.add_argument("--recursive", action="store_true", help="Обрабатывать вложенные папки рекурсивно")
+    p_date.add_argument("--recursive", action="store_true", help="Обрабатывать вложенные папки")
     p_date.set_defaults(func=add_date)
+
+    # analyse
+    p_analyse = subparsers.add_parser("analyse", help="Анализ размера файлов и папок")
+    p_analyse.add_argument("directory", help="Папка для анализа")
+    p_analyse.set_defaults(func=analyse)
 
     args = parser.parse_args()
     try:

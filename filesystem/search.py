@@ -7,14 +7,14 @@ def search_files(args):
     pattern = args.pattern
 
     if not os.path.exists(directory):
-        raise FileNotFoundError(f"❌ Путь не найден: {directory}")
+        raise FileNotFoundError(f" Путь не найден: {directory}")
     if not os.path.isdir(directory):
-        raise NotADirectoryError(f"❌ Указанный путь не является папкой: {directory}")
+        raise NotADirectoryError(f" Указанный путь не является папкой: {directory}")
 
     try:
         compiled_pattern = re.compile(pattern)
     except re.error as e:
-        raise ValueError(f"❌ Некорректное регулярное выражение: {e}")
+        raise ValueError(f" Некорректное регулярное выражение: {e}")
 
     found_files = []
     # Рекурсивный обход всех вложенных папок
@@ -25,10 +25,10 @@ def search_files(args):
                 found_files.append(full_path)
 
     if found_files:
-        logging.info(f"🔍 Найдено файлов: {len(found_files)}")
+        logging.info(f" Найдено файлов: {len(found_files)}")
         for f in found_files:
             logging.info(f"  - {f}")
     else:
-        logging.info("🔍 Файлы не найдены.")
+        logging.info(" Файлы не найдены.")
 
     return found_files

@@ -1,34 +1,53 @@
-import os
-import re
+#!/usr/bin/env python3
+import argparse
 import logging
+import sys
+from filesystem.copy import copy_file
+from filesystem.delete import delete_path
+from filesystem.count import count_files
+from filesystem.search import search_files
+from filesystem.add_date import add_date
 
-def search_files(args):
-    directory = args.directory
-    pattern = args.pattern
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    if not os.path.exists(directory):
-        raise FileNotFoundError(f"❌ Путь не найден: {directory}")
-    if not os.path.isdir(directory):
-        raise NotADirectoryError(f"❌ Указанный путь не является папкой: {directory}")
+def main():
+    parser = argparse.ArgumentParser(description="CLI File System Manager")
+    subparsers = parser.add_subparsers(dest="command", required=True, help="Доступные команды")
 
+    # copy
+    p_copy = subparsers.add_parser("copy", help="Копировать файл")
+    p_copy.add_argument("source", help="Исходный файл")
+    p_copy.add_argument("destination", help="Куда копировать")
+    p_copy.set_defaults(func=copy_file)
+
+    # delete
+    p_delete = subparsers.add_parser("delete", help="Удалить файл или папку")
+    p_delete.add_argument("path", help="Путь к файлу/папке")
+    p_delete.set_defaults(func=delete_path)
+
+    # count
+    p_count = subparsers.add_parser("count", help="Посчитать файлы в папке")
+    p_count.add_argument("directory", help="Папка для подсчёта")
+    p_count.set_defaults(func=count_files)
+
+    # search
+    p_search = subparsers.add_parser("search", help="Найти файлы по регулярному выражению")
+    p_search.add_argument("directory", help="Где искать")
+    p_search.add_argument("pattern", help="Регулярное выражение")
+    p_search.set_defaults(func=search_files)
+
+    # add-date
+    p_date = subparsers.add_parser("add-date", help="Добавить дату создания в имя файла")
+    p_date.add_argument("path", help="Файл или папка")
+    p_date.add_argument("--recursive", action="store_true", help="Обрабатывать вложенные папки рекурсивно")
+    p_date.set_defaults(func=add_date)
+
+    args = parser.parse_args()
     try:
-        compiled_pattern = re.compile(pattern)
-    except re.error as e:
-        raise ValueError(f"❌ Некорректное регулярное выражение: {e}")
+        args.func(args)
+    except Exception as e:
+        logging.error(f"Ошибка: {e}")
+        sys.exit(1)
 
-    found_files = []
-    # Рекурсивный обход всех вложенных папок
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if compiled_pattern.search(file):
-                full_path = os.path.join(root, file)
-                found_files.append(full_path)
-
-    if found_files:
-        logging.info(f"🔍 Найдено файлов: {len(found_files)}")
-        for f in found_files:
-            logging.info(f"  - {f}")
-    else:
-        logging.info("🔍 Файлы не найдены.")
-
-    return found_files
+if __name__ == "__main__":
+    main()

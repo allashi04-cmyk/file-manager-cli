@@ -4,6 +4,7 @@ import logging
 import sys
 from filesystem.copy import copy_file
 from filesystem.delete import delete_path
+from filesystem.count import count_files
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -21,6 +22,11 @@ def main():
     p_delete = subparsers.add_parser("delete", help="Удалить файл или папку")
     p_delete.add_argument("path", help="Путь к файлу или папке")
     p_delete.set_defaults(func=delete_path)
+
+    # Команда count
+    p_count = subparsers.add_parser("count", help="Посчитать количество файлов в папке")
+    p_count.add_argument("directory", help="Папка для подсчёта")
+    p_count.set_defaults(func=count_files)
 
     args = parser.parse_args()
     try:
